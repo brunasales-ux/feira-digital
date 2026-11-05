@@ -1,0 +1,576 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Feira na Mão</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Baloo+2:wght@600;800&display=swap">
+<style>
+/* Layout: uma coluna de celular (máx. 440px) centrada; cada tela é uma seção que ocupa a altura toda, com ação principal no rodapé. */
+:root{
+  --bg:#F3F6F0; --surface:#FFFFFF; --ink:#18241A; --muted:#4D5B4F; --line:#C9D3C6;
+  --leaf:#2D6A30; --leaf-ink:#FFFFFF; --leaf-soft:#E2EEDD;
+  --corn:#F2B705; --corn-ink:#2A2100;
+  --error:#B3261E; --error-soft:#FBE9E7;
+  --ph:#E7ECE4;
+  --display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", Verdana, system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121812; --surface:#1C241C; --ink:#EEF3EC; --muted:#B4C2B3; --line:#3A473A;
+  --leaf:#7CC47F; --leaf-ink:#0D1A0E; --leaf-soft:#243824;
+  --corn:#F5C431; --corn-ink:#231B00; --error:#FF8A80; --error-soft:#3A1F1C; --ph:#263026; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121812; --surface:#1C241C; --ink:#EEF3EC; --muted:#B4C2B3; --line:#3A473A;
+  --leaf:#7CC47F; --leaf-ink:#0D1A0E; --leaf-soft:#243824;
+  --corn:#F5C431; --corn-ink:#231B00; --error:#FF8A80; --error-soft:#3A1F1C; --ph:#263026; color-scheme:dark}
+
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:19px;line-height:1.4;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+*{box-sizing:border-box}
+#app{max-width:440px;margin:0 auto;height:100%;display:flex;flex-direction:column}
+.screen{flex:1;display:flex;flex-direction:column;gap:18px;padding-block:16px 20px;min-height:0;overflow-y:auto}
+h1{font-family:var(--display);font-weight:800;font-size:32px;line-height:1.1;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:700;font-size:24px;line-height:1.15;margin:0}
+p{margin:0}
+.muted{color:var(--muted)}
+.center{text-align:center;align-items:center}
+.grow{flex:1}
+
+/* barra do topo */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:60px}
+.step{font-weight:700;color:var(--muted);font-size:17px}
+.icon-btn{width:60px;height:60px;border-radius:18px;border:2px solid var(--line);background:var(--surface);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.listen{height:60px;padding:0 20px;border-radius:30px;border:0;background:var(--corn);color:var(--corn-ink);font:700 19px var(--body);display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.listen.on{outline:4px solid var(--corn);outline-offset:3px}
+.bars{display:flex;gap:8px}.bars i{flex:1;height:9px;border-radius:5px;background:var(--line)}.bars i.on{background:var(--leaf)}
+
+/* botões */
+.btn{min-height:66px;width:100%;border-radius:18px;border:0;font:700 22px var(--body);display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;padding:8px 16px;text-align:center}
+.primary{background:var(--leaf);color:var(--leaf-ink)}
+.ghost{background:var(--surface);color:var(--ink);border:2px solid var(--line)}
+.outline{background:var(--surface);color:var(--leaf);border:2px solid var(--leaf)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+button:focus-visible,input:focus-visible,label.btn:focus-within{outline:4px solid var(--corn);outline-offset:3px}
+
+/* campos */
+.field{display:flex;flex-direction:column;gap:8px}
+.field label{font-weight:700;font-size:19px}
+.input{height:70px;border-radius:18px;border:2px solid var(--muted);background:var(--surface);color:var(--ink);padding:0 18px;font:700 26px var(--body);width:100%;min-width:0;letter-spacing:.5px}
+.input.bad{border:3px solid var(--error)}
+.hint{font-size:16px;color:var(--muted)}
+.err{display:flex;gap:8px;align-items:center;color:var(--error);font-weight:700;font-size:17px}
+.withmic{display:flex;gap:10px}
+.mic{width:70px;height:70px;flex-shrink:0;border-radius:18px;border:2px solid var(--leaf);background:var(--leaf-soft);color:var(--leaf);display:grid;place-items:center;cursor:pointer}
+.code{display:flex;justify-content:center;gap:12px}
+.code input{width:68px;height:82px;border-radius:18px;border:3px solid var(--muted);background:var(--surface);color:var(--ink);text-align:center;font:800 38px var(--display)}
+.note{background:var(--leaf-soft);border-radius:14px;padding:12px 14px;font-size:16px}
+
+/* ícone círculo grande */
+.badge{width:100px;height:100px;border-radius:50%;background:var(--leaf-soft);color:var(--leaf);display:grid;place-items:center}
+.done{width:170px;height:170px;border-radius:50%;background:var(--leaf);color:var(--leaf-ink);display:grid;place-items:center;animation:pop .45s ease-out}
+@keyframes pop{from{transform:scale(.6)}to{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.done{animation:none}}
+
+/* início */
+.hello{display:flex;flex-direction:column}
+.big-tile{flex:1;min-height:220px;border-radius:24px;border:0;background:var(--leaf);color:var(--leaf-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-family:var(--body)}
+.big-tile b{font:800 28px var(--display)}
+.tile{min-height:150px;border-radius:22px;background:var(--surface);border:2px solid var(--leaf);color:var(--leaf);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;font:700 20px var(--body);padding:10px}
+.tile.off{border:2px dashed var(--line);color:var(--muted);cursor:default}
+.tile small{font-size:14px;font-weight:400}
+.stat{background:var(--surface);border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.stat b{font:800 28px var(--display);color:var(--leaf)}
+
+/* cadastro */
+.data{border:2px solid var(--line);border-radius:16px;padding:12px 16px;background:var(--surface);display:flex;flex-direction:column;gap:2px}
+.data span{font-size:15px;color:var(--muted)}.data b{font-size:22px;letter-spacing:.5px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--leaf-soft);color:var(--leaf);border-radius:20px;padding:6px 14px;font-weight:700;font-size:16px}
+
+/* câmera */
+.cam{flex:1;min-height:300px;border-radius:24px;background:var(--ph);border:4px dashed var(--leaf);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);padding:20px;text-align:center;overflow:hidden}
+.cam img{width:100%;height:100%;object-fit:cover;border-radius:16px;max-width:100%}
+.shoot{width:104px;height:104px;border-radius:50%;background:var(--leaf);color:var(--leaf-ink);border:6px solid var(--surface);box-shadow:0 0 0 3px var(--leaf);display:grid;place-items:center;cursor:pointer;margin:0 auto}
+.linkish{background:none;border:0;color:var(--muted);text-decoration:underline;font:16px var(--body);cursor:pointer;padding:8px}
+
+/* produto */
+.grid5{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.opt{border-radius:16px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font:700 16px var(--body);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 4px}
+.opt[aria-pressed="true"]{border:3px solid var(--leaf);background:var(--leaf-soft);color:var(--ink)}
+.prod{min-height:96px}.unit{min-height:60px;font-size:18px}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{min-height:48px;border-radius:24px;padding:0 16px;flex-direction:row}
+.price{display:flex;align-items:center;gap:8px;height:70px;border-radius:18px;border:2px solid var(--muted);background:var(--surface);padding:0 18px}
+.price span{font:700 24px var(--body);color:var(--muted)}
+.price input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:800 30px var(--display);outline:none;font-variant-numeric:tabular-nums}
+.price:focus-within{outline:4px solid var(--corn);outline-offset:3px}
+.say{font-weight:700;color:var(--leaf);font-size:18px}
+section.block{display:flex;flex-direction:column;gap:8px}
+section.block>h3{margin:0;font-size:19px}
+
+/* anúncio */
+.card{background:var(--surface);border-radius:22px;overflow:hidden;border:1px solid var(--line)}
+.card .pic{aspect-ratio:4/3;max-width:100%;background:var(--ph);display:grid;place-items:center;color:var(--muted)}
+.card .pic img{width:100%;height:100%;object-fit:cover}
+.card .info{padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.card .name{font:800 24px var(--display)}
+.card .val{font:800 22px var(--display);color:var(--leaf);font-variant-numeric:tabular-nums}
+.card .who{font-size:15px;color:var(--muted)}
+.feed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.feed .card .name{font-size:19px}.feed .card .val{font-size:17px}.feed .card .info{padding:10px 12px;gap:2px}
+.empty{border:2px dashed var(--line);border-radius:18px;padding:24px;text-align:center;color:var(--muted)}
+
+/* aviso flutuante */
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom, 0px));max-width:min(420px, calc(100% - 32px));background:var(--ink);color:var(--bg);padding:14px 18px;border-radius:16px;font-size:17px;z-index:20;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.proto{font-size:13px;color:var(--muted);text-align:center}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+
+<div id="app">
+
+<!-- T1 Boas-vindas -->
+<section class="screen" id="s-welcome" data-say="welcome">
+  <div class="top"><span></span><button class="listen" data-listen>Ouvir</button></div>
+  <div class="grow center" style="display:flex;flex-direction:column;justify-content:center;gap:20px">
+    <svg width="200" height="170" viewBox="0 0 200 170" role="img" aria-label="Cesta com verduras">
+      <ellipse cx="100" cy="150" rx="80" ry="10" fill="var(--line)"/>
+      <circle cx="70" cy="70" r="30" fill="var(--leaf)"/><circle cx="105" cy="58" r="34" fill="var(--leaf)" opacity=".8"/>
+      <ellipse cx="140" cy="78" rx="16" ry="34" fill="var(--corn)" transform="rotate(25 140 78)"/>
+      <path d="M30 90h140l-16 56H46z" fill="#9C6B3C"/><path d="M40 105h120M46 125h108" stroke="#7A5230" stroke-width="4"/>
+    </svg>
+    <h1>Feira na Mão</h1>
+    <p style="font-size:21px">Venda o que você planta direto para quem compra.</p>
+    <p class="muted">Toque no botão amarelo para ouvir.</p>
+  </div>
+  <button class="btn primary" data-go="phone" data-mode="new">Quero vender</button>
+  <button class="btn outline" data-go="phone" data-mode="login">Já tenho conta</button>
+  <button class="linkish" data-go="feira">Ver a feira como cliente</button>
+</section>
+
+<!-- T2 Telefone -->
+<section class="screen" id="s-phone" data-say="phone" hidden>
+  <div class="top"><button class="icon-btn" data-back aria-label="Voltar"></button><span class="step">Passo 1 de 3</span><button class="listen" data-listen>Ouvir</button></div>
+  <div class="bars"><i class="on"></i><i></i><i></i></div>
+  <div class="center" style="display:flex;flex-direction:column;gap:12px">
+    <div class="badge"><svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+    <h1>Qual é o seu celular?</h1>
+    <p class="muted">Vamos mandar um código por mensagem.</p>
+  </div>
+  <div class="field">
+    <label for="tel">Número com DDD</label>
+    <input class="input" id="tel" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(00) 00000-0000" data-help="Digite o número do seu celular com DDD. São 11 números.">
+    <div class="err" id="tel-err" hidden></div>
+  </div>
+  <div class="grow"></div>
+  <button class="btn primary" id="send-code">Mandar código</button>
+</section>
+
+<!-- T3 Código -->
+<section class="screen" id="s-code" data-say="code" hidden>
+  <div class="top"><button class="icon-btn" data-back aria-label="Voltar"></button><span class="step">Passo 2 de 3</span><button class="listen" data-listen>Ouvir</button></div>
+  <div class="bars"><i class="on"></i><i class="on"></i><i></i></div>
+  <div class="center" style="display:flex;flex-direction:column;gap:8px">
+    <h1>Digite o código</h1>
+    <p class="muted">Mandamos 4 números para<br><b id="tel-show"></b></p>
+  </div>
+  <div class="code" id="code">
+    <input inputmode="numeric" maxlength="1" aria-label="Número 1" id="c1"><input inputmode="numeric" maxlength="1" aria-label="Número 2" id="c2"><input inputmode="numeric" maxlength="1" aria-label="Número 3" id="c3"><input inputmode="numeric" maxlength="1" aria-label="Número 4" id="c4">
+  </div>
+  <div class="err" id="code-err" hidden></div>
+  <p class="note">Protótipo: o código de teste é <b>1234</b>.</p>
+  <button class="btn ghost" id="resend" disabled>Mandar de novo</button>
+  <div class="grow"></div>
+  <button class="btn primary" id="check-code">Confirmar</button>
+</section>
+
+<!-- T4 Nome e CPF -->
+<section class="screen" id="s-dados" data-say="dados" hidden>
+  <div class="top"><button class="icon-btn" data-back aria-label="Voltar"></button><span class="step" id="dados-step">Passo 3 de 3</span><button class="listen" data-listen>Ouvir</button></div>
+  <div class="bars" id="dados-bars"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+  <div><h1 id="dados-title">Falta pouco!</h1><p class="muted">Conte quem é você.</p></div>
+  <div class="field">
+    <label for="nome">Seu nome</label>
+    <div class="withmic">
+      <input class="input" id="nome" type="text" autocomplete="name" placeholder="Ex.: Maria da Silva" style="font-size:22px" data-help="Escreva seu nome. Se preferir, toque no microfone e fale.">
+      <button class="mic" data-mic="nome" aria-label="Falar o nome"></button>
+    </div>
+    <div class="err" id="nome-err" hidden></div>
+  </div>
+  <div class="field">
+    <label for="cpf">Seu CPF</label>
+    <input class="input" id="cpf" type="text" inputmode="numeric" placeholder="000.000.000-00" data-help="Digite os 11 números do seu CPF. Os pontos aparecem sozinhos.">
+    <div class="err" id="cpf-err" hidden></div>
+  </div>
+  <div class="grow"></div>
+  <p class="hint center" style="display:flex">Seus dados ficam guardados e não aparecem para os clientes.</p>
+  <button class="btn primary" id="save-dados">Criar minha conta</button>
+</section>
+
+<!-- T5 Conta ativa -->
+<section class="screen" id="s-ativa" data-say="ativa" hidden>
+  <div class="top"><span></span><button class="listen" data-listen>Ouvir</button></div>
+  <div class="grow center" style="display:flex;flex-direction:column;justify-content:center;gap:18px">
+    <div class="done"><svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Pronto"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h1 id="ativa-title">Pronto!</h1>
+    <p style="font-size:23px;font-weight:700;color:var(--leaf)">Sua conta está ativa.</p>
+    <p class="muted">Agora você já pode colocar seus produtos na feira.</p>
+  </div>
+  <button class="btn primary" data-go="home">Começar</button>
+</section>
+
+<!-- T6 Início -->
+<section class="screen" id="s-home" data-say="home" hidden>
+  <div class="top"><div class="hello"><span class="muted" style="font-size:17px">Olá,</span><h2 id="home-name">Maria</h2></div><button class="listen" data-listen>Ouvir</button></div>
+  <p style="font-weight:700;font-size:20px">O que você quer fazer?</p>
+  <button class="big-tile" data-go="foto">
+    <svg width="76" height="76" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13" r="4"/></svg>
+    <b>Vender produto</b><span>Tire uma foto do que colheu</span>
+  </button>
+  <div class="row2">
+    <div class="tile off" aria-disabled="true">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18l-2 11H5z"/><path d="M8 9l4-6 4 6"/></svg>
+      Pedidos<small>Próxima sprint</small>
+    </div>
+    <button class="tile" data-go="perfil">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+      Meu cadastro
+    </button>
+  </div>
+  <button class="stat ghost" data-go="feira" style="border:2px solid var(--line);cursor:pointer;font:inherit;color:var(--ink)"><span>Meus produtos na feira</span><b id="home-count">0</b></button>
+</section>
+
+<!-- T7 Meu cadastro -->
+<section class="screen" id="s-perfil" data-say="perfil" hidden>
+  <div class="top"><button class="icon-btn" data-back aria-label="Voltar"></button><span class="step" style="color:var(--ink);font-size:20px">Meu cadastro</span><button class="listen" data-listen>Ouvir</button></div>
+  <div class="center" style="display:flex;flex-direction:column;gap:10px">
+    <div class="badge"><svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
+    <span class="chip"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Conta ativa</span>
+  </div>
+  <div class="data"><span>Nome</span><b id="p-nome"></b></div>
+  <div class="data"><span>Celular</span><b id="p-tel"></b></div>
+  <div class="data"><span>CPF</span><b id="p-cpf"></b></div>
+  <div class="grow"></div>
+  <button class="btn primary" id="edit-dados">Arrumar meus dados</button>
+  <button class="btn ghost" id="logout" style="min-height:58px;font-size:19px">Sair do app</button>
+</section>
+
+<!-- T8 Foto -->
+<section class="screen" id="s-foto" data-say="foto" hidden>
+  <div class="top"><button class="icon-btn" data-back aria-label="Voltar"></button><span class="step">Foto · 1 de 3</span><button class="listen" data-listen>Ouvir</button></div>
+  <div id="foto-take" style="display:flex;flex-direction:column;gap:16px;flex:1">
+    <h2 class="center" style="display:flex;justify-content:center">Mostre o que você colheu</h2>
+    <div class="cam">
+      <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13" r="4"/></svg>
+      <span>Coloque o produto num lugar com luz e deixe ele no meio da foto.</span>
+    </div>
+    <label class="shoot" for="foto-in" aria-label="Tirar foto"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13" r="4"/></svg></label>
+    <input id="foto-in" class="vh" type="file" accept="image/*" capture="environment">
+    <p class="center" style="display:flex;justify-content:center;font-weight:700">Tirar foto</p>
+    <button class="linkish" id="foto-skip">Continuar sem foto (só no teste)</button>
+  </div>
+  <div id="foto-review" style="display:flex;flex-direction:column;gap:16px;flex:1" hidden>
+    <h2 class="center" style="display:flex;justify-content:center">A foto ficou boa?</h2>
+    <div class="cam" style="border-style:solid;padding:6px"><img id="foto-img" alt="Foto do produto"></div>
+    <div class="row2">
+      <button class="btn ghost" id="foto-again">Tirar outra</button>
+      <button class="btn primary" data-go="produto">Ficou boa</button>
+    </div>
+  </div>
+</section>
+
+<!-- T9 Produto -->
+<section class="screen" id="s-produto" data-say="produto" hidden>
+  <div class="top"><button class="icon-btn" data-back aria-label="Voltar"></button><span class="step">Produto · 2 de 3</span><button class="listen" data-listen>Ouvir</button></div>
+  <section class="block"><h3>1. O que é?</h3><div class="grid5" id="prods"></div>
+    <input class="input" id="outro" placeholder="Nome do produto" style="font-size:22px" hidden data-help="Escreva o nome do produto.">
+  </section>
+  <section class="block"><h3>2. Vende por</h3><div class="grid4" id="units"></div></section>
+  <section class="block"><h3><label for="preco">3. Preço</label></h3>
+    <div class="price"><span>R$</span><input id="preco" inputmode="numeric" value="0,00" aria-describedby="preco-say" data-help="Digite o preço. Digite só os números, a vírgula aparece sozinha."></div>
+    <span class="say" id="preco-say"></span>
+    <div class="err" id="preco-err" hidden></div>
+  </section>
+  <section class="block"><h3>4. Conte mais (se quiser)</h3>
+    <div class="tags" id="tags"></div>
+    <div class="withmic"><input class="input" id="desc" placeholder="Ex.: mandioca mansa, boa para cozinhar" style="font-size:18px;height:62px" data-help="Se quiser, escreva ou fale um pouco sobre o produto."><button class="mic" data-mic="desc" aria-label="Falar a descrição" style="width:62px;height:62px"></button></div>
+  </section>
+  <button class="btn primary" id="to-previa">Ver como ficou</button>
+</section>
+
+<!-- T10 Prévia -->
+<section class="screen" id="s-previa" data-say="previa" hidden>
+  <div class="top"><button class="icon-btn" data-back aria-label="Voltar"></button><span class="step">Prévia · 3 de 3</span><button class="listen" data-listen>Ouvir</button></div>
+  <p class="center muted" style="display:flex;justify-content:center">Assim o cliente vai ver:</p>
+  <div id="previa-card"></div>
+  <div class="grow"></div>
+  <h2 class="center" style="display:flex;justify-content:center">Ficou bom?</h2>
+  <div class="row2">
+    <button class="btn ghost" data-back>Arrumar</button>
+    <button class="btn primary" id="publish">Sim, publicar</button>
+  </div>
+</section>
+
+<!-- T11 Publicado -->
+<section class="screen" id="s-ok" data-say="ok" hidden>
+  <div class="top"><span></span><button class="listen" data-listen>Ouvir</button></div>
+  <div class="grow center" style="display:flex;flex-direction:column;justify-content:center;gap:18px">
+    <div class="done"><svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Publicado"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h1>Seu produto já está na feira!</h1>
+    <p class="muted">Avisaremos quando chegar um pedido.</p>
+  </div>
+  <button class="btn primary" id="sell-more">Vender outro produto</button>
+  <button class="btn outline" data-go="feira">Ver na feira</button>
+  <button class="btn ghost" data-go="home" style="min-height:58px;font-size:19px">Voltar ao início</button>
+</section>
+
+<!-- Vitrine (cliente) -->
+<section class="screen" id="s-feira" data-say="feira" hidden>
+  <div class="top"><button class="icon-btn" data-back aria-label="Voltar"></button><span class="step" style="color:var(--ink);font-size:20px">Feira de hoje</span><button class="listen" data-listen>Ouvir</button></div>
+  <p class="muted">Visão do cliente: produtos de quem planta, entregues em casa.</p>
+  <div class="feed" id="feed"></div>
+</section>
+
+<p class="proto">Protótipo de IHC · áudio pela voz do navegador</p>
+</div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+const ICON = {
+  back:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>',
+  speaker:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>',
+  stop:'<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>',
+  mic:'<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>',
+  alert:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" style="flex-shrink:0"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 17h.01"/></svg>'
+};
+const PRODS = [
+  {id:'mandioca',nome:'Mandioca',svg:'<svg width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 38c6-14 16-26 28-30 2 6-8 22-24 32z" fill="#9C6B3C"/><path d="M36 9l6-5M37 10l7 0" stroke="#3E8E41" stroke-width="3" stroke-linecap="round"/></svg>'},
+  {id:'alface',nome:'Alface',svg:'<svg width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="27" r="16" fill="#5DAA4F"/><path d="M24 12c-6 6-6 22 0 30M24 12c6 6 6 22 0 30" stroke="#2D6A30" stroke-width="2.5" fill="none"/></svg>'},
+  {id:'ovos',nome:'Ovos',svg:'<svg width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="17" cy="28" rx="10" ry="13" fill="#F1E3C8" stroke="#9C6B3C" stroke-width="2"/><ellipse cx="32" cy="26" rx="10" ry="13" fill="#FFF7EA" stroke="#9C6B3C" stroke-width="2"/></svg>'},
+  {id:'banana',nome:'Banana',svg:'<svg width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 18c4 16 20 22 34 14-12 2-24-4-28-16z" fill="#F2C230" stroke="#8A6A00" stroke-width="2"/></svg>'},
+  {id:'feijao',nome:'Feijão',svg:'<svg width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="16" cy="20" rx="7" ry="5" fill="#7A3B2E"/><ellipse cx="30" cy="18" rx="7" ry="5" fill="#8E4A3A"/><ellipse cx="23" cy="31" rx="7" ry="5" fill="#6B3226"/></svg>'},
+  {id:'outro',nome:'Outro',svg:'<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'}
+];
+const UNITS = [{id:'kg',nome:'kg',fala:'o quilo',txt:'o kg'},{id:'maco',nome:'maço',fala:'o maço',txt:'o maço'},{id:'duzia',nome:'dúzia',fala:'a dúzia',txt:'a dúzia'},{id:'pacote',nome:'pacote',fala:'o pacote',txt:'o pacote'}];
+const TAGS = ['Colhido hoje','Sem veneno','Orgânico','Da roça'];
+
+// ---------- estado ----------
+const st = { mode:'new', editing:false, user:null, tel:'', foto:null, prod:'mandioca', unit:'kg', cents:0, tags:{'Colhido hoje':true}, products:[], hist:['welcome'] };
+const EXEMPLOS = [
+  {nome:'Alface crespa',val:'R$ 3,00 o maço',who:'João · Sítio Boa Vista',tags:['Colhido hoje'],prod:'alface'},
+  {nome:'Ovos caipira',val:'R$ 15,00 a dúzia',who:'Ana · Chácara das Flores',tags:['Da roça'],prod:'ovos'}
+];
+try{ const saved = JSON.parse(localStorage.getItem('feira-na-mao')||'null'); if(saved){ st.user=saved.user; st.products=saved.products||[]; } }catch(e){}
+function persist(){ try{ localStorage.setItem('feira-na-mao', JSON.stringify({user:st.user, products:st.products.map(p=>Object.assign({},p,{foto:null}))})); }catch(e){} }
+
+// ---------- voz ----------
+let voice=null, autoAudio=true, speakingBtn=null;
+function pickVoice(){ try{ const vs=speechSynthesis.getVoices(); voice = vs.find(v=>/pt[-_]BR/i.test(v.lang)) || vs.find(v=>/^pt/i.test(v.lang)) || null; }catch(e){} }
+if('speechSynthesis' in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function setListen(btn,on){ if(!btn) return; btn.classList.toggle('on',on); btn.innerHTML = (on?ICON.stop+'Parar':ICON.speaker+'Ouvir'); }
+function falar(texto, btn){
+  if(!('speechSynthesis' in window)){ toast('Este navegador não tem voz. Leia: '+texto); return; }
+  speechSynthesis.cancel(); setListen(speakingBtn,false); speakingBtn=btn||null;
+  const u = new SpeechSynthesisUtterance(texto); u.lang='pt-BR'; if(voice) u.voice=voice; u.rate=0.92;
+  u.onstart=()=>setListen(speakingBtn,true); u.onend=u.onerror=()=>{ setListen(speakingBtn,false); speakingBtn=null; };
+  speechSynthesis.speak(u);
+}
+function parar(){ try{ speechSynthesis.cancel(); }catch(e){} setListen(speakingBtn,false); speakingBtn=null; }
+function reaisFala(c){ const r=Math.floor(c/100), ce=c%100; let s = r? (r+(r===1?' real':' reais')) : ''; if(ce) s += (s?' e ':'')+ce+' centavos'; return s||'zero reais'; }
+function reaisTxt(c){ return 'R$ '+(Math.floor(c/100)).toLocaleString('pt-BR')+','+String(c%100).padStart(2,'0'); }
+function prodNome(){ return st.prod==='outro' ? ($('#outro').value.trim()||'Produto') : PRODS.find(p=>p.id===st.prod).nome; }
+function unitObj(){ return UNITS.find(u=>u.id===st.unit); }
+function primeiroNome(){ return st.user ? st.user.nome.split(' ')[0] : ''; }
+
+const ROTEIRO = {
+  welcome:()=>'Olá! Este é o Feira na Mão. Aqui você vende o que planta para quem compra. Para começar, toque no botão verde: Quero vender. Sempre que quiser ouvir de novo, toque no botão amarelo.',
+  phone:()=>'Passo 1 de 3. Digite o número do seu celular, com o DDD. Depois, toque no botão verde: Mandar código.',
+  code:()=>'Passo 2 de 3. Mandamos uma mensagem com 4 números para o seu celular. Digite os números nos quadrados e toque em Confirmar.',
+  dados:()=> st.editing ? 'Aqui você arruma seus dados. Mude o que precisar e toque em Salvar.' : 'Passo 3 de 3. Escreva o seu nome e os números do seu CPF. Depois toque em Criar minha conta.',
+  ativa:()=>'Pronto, '+primeiroNome()+'! Sua conta está ativa. Toque em Começar.',
+  home:()=>'Olá, '+primeiroNome()+'. Para vender, toque no botão verde grande, com a câmera. Para ver seus dados, toque em Meu cadastro. Você tem '+st.products.length+(st.products.length===1?' produto':' produtos')+' na feira.',
+  perfil:()=>'Seus dados. Nome: '+st.user.nome+'. Celular: '+st.user.tel.split('').join(' ')+'. O CPF fica escondido para sua segurança. Para mudar, toque em Arrumar meus dados.',
+  foto:()=> $('#foto-review').hidden ? 'Vamos tirar a foto do produto. Coloque o produto num lugar com luz, no meio da foto, e toque no botão redondo verde.' : 'A foto ficou boa? Se sim, toque em Ficou boa. Se não, toque em Tirar outra.',
+  produto:()=>'Agora conte sobre o produto. Primeiro, toque no desenho do que você vai vender. Depois, escolha se vende por quilo, maço, dúzia ou pacote. Por último, digite o preço.',
+  previa:()=>'Assim o cliente vai ver: '+prodNome()+', '+reaisFala(st.cents)+' '+unitObj().fala+'. Se ficou bom, toque em Sim, publicar. Se quiser mudar, toque em Arrumar.',
+  ok:()=>'Pronto! Seu produto já está na feira. Vamos avisar quando chegar um pedido.',
+  feira:()=>'Esta é a feira, do jeito que o cliente vê. Tem '+(st.products.length+EXEMPLOS.length)+' produtos.'
+};
+
+// ---------- navegação ----------
+function show(id, push=true){
+  parar();
+  $$('.screen').forEach(s=>s.hidden = s.id!=='s-'+id);
+  if(push && st.hist[st.hist.length-1]!==id) st.hist.push(id);
+  if(RENDER[id]) RENDER[id]();
+  const scr = $('#s-'+id); scr.scrollTop=0;
+  if(autoAudio && userTouched) setTimeout(()=>falar(ROTEIRO[id](), scr.querySelector('[data-listen]')), 250);
+}
+function back(){ if(st.hist.length>1){ st.hist.pop(); show(st.hist[st.hist.length-1], false); } }
+let userTouched=false;
+document.addEventListener('pointerdown',()=>{userTouched=true},{once:true,capture:true});
+document.addEventListener('keydown',()=>{userTouched=true},{once:true,capture:true});
+
+document.addEventListener('click', e=>{
+  const go = e.target.closest('[data-go]'); if(go){ if(go.dataset.mode) st.mode=go.dataset.mode; show(go.dataset.go); return; }
+  if(e.target.closest('[data-back]')){ back(); return; }
+  const ls = e.target.closest('[data-listen]');
+  if(ls){ if(ls.classList.contains('on')) parar(); else falar(ROTEIRO[ls.closest('.screen').dataset.say](), ls); }
+});
+// ajuda falada ao tocar no campo
+document.addEventListener('focusin', e=>{ const h=e.target.dataset && e.target.dataset.help; if(h && autoAudio && userTouched) falar(h); });
+
+$$('[data-back]').forEach(b=>{ if(b.classList.contains('icon-btn')) b.innerHTML=ICON.back; });
+$$('[data-listen]').forEach(b=>setListen(b,false));
+$$('[data-mic]').forEach(b=>b.innerHTML=ICON.mic);
+
+let toastT; function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,4200); }
+function erro(id,msg){ const el=$('#'+id+'-err'); const inp=$('#'+id); if(!msg){ el.hidden=true; inp&&inp.classList.remove('bad'); return true; } el.innerHTML=ICON.alert+'<span>'+msg+'</span>'; el.hidden=false; inp&&inp.classList.add('bad'); falar(msg); return false; }
+
+// ---------- máscaras ----------
+const dig = v => v.replace(/\D/g,'');
+function maskTel(v){ v=dig(v).slice(0,11); if(v.length<=2) return v.length?'('+v:''; if(v.length<=7) return '('+v.slice(0,2)+') '+v.slice(2); return '('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7); }
+function maskCpf(v){ v=dig(v).slice(0,11); return v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); }
+$('#tel').addEventListener('input', e=>{ e.target.value=maskTel(e.target.value); erro('tel'); });
+$('#cpf').addEventListener('input', e=>{ e.target.value=maskCpf(e.target.value); erro('cpf'); });
+
+// ---------- T2 / T3 ----------
+let resendT;
+$('#send-code').addEventListener('click', ()=>{
+  const n = dig($('#tel').value);
+  if(n.length<11) return erro('tel', n.length? 'Faltam '+(11-n.length)+' números no celular.' : 'Digite o número do seu celular.');
+  st.tel=n; $('#tel-show').textContent=maskTel(n); $$('#code input').forEach(i=>i.value=''); erro('code');
+  startResend(); show('code'); setTimeout(()=>$('#c1').focus(),300);
+});
+function startResend(){ const b=$('#resend'); let s=30; b.disabled=true; clearInterval(resendT);
+  const tick=()=>{ b.textContent='Mandar de novo em 0:'+String(s).padStart(2,'0'); if(s--<=0){ clearInterval(resendT); b.disabled=false; b.textContent='Mandar de novo'; } }; tick(); resendT=setInterval(tick,1000); }
+$('#resend').addEventListener('click', ()=>{ startResend(); toast('Mandamos outro código. No teste, use 1234.'); falar('Mandamos outro código.'); });
+$$('#code input').forEach((inp,i,all)=>{
+  inp.addEventListener('input', ()=>{ inp.value=dig(inp.value).slice(-1); erro('code'); if(inp.value && all[i+1]) all[i+1].focus(); if(all.every(x=>x.value)) checkCode(); });
+  inp.addEventListener('keydown', e=>{ if(e.key==='Backspace' && !inp.value && all[i-1]) all[i-1].focus(); });
+});
+function checkCode(){
+  const c=$$('#code input').map(i=>i.value).join('');
+  if(c.length<4) return erro('code','Faltam números no código.');
+  if(c!=='1234'){ $$('#code input').forEach(i=>i.value=''); $('#c1').focus(); return erro('code','Esse código não é o certo. Tente de novo.'); }
+  if(st.mode==='login' && st.user && st.user.tel===st.tel){ show('home'); return; }
+  if(st.mode==='login'){ toast('Não achamos esse celular. Vamos criar sua conta.'); }
+  st.editing=false; prepDados(); show('dados');
+}
+$('#check-code').addEventListener('click', checkCode);
+
+// ---------- T4 ----------
+function prepDados(){
+  const ed=st.editing;
+  $('#dados-step').textContent = ed?'Arrumar dados':'Passo 3 de 3';
+  $('#dados-bars').hidden = ed; $('#dados-title').textContent = ed?'Arrume seus dados':'Falta pouco!';
+  $('#save-dados').textContent = ed?'Salvar':'Criar minha conta';
+  if(ed){ $('#nome').value=st.user.nome; $('#cpf').value=maskCpf(st.user.cpf); }
+  erro('nome'); erro('cpf');
+}
+function cpfOk(c){ if(c.length!==11||/^(\d)\1+$/.test(c)) return false; let s=0; for(let i=0;i<9;i++) s+=+c[i]*(10-i); let d=(s*10)%11%10; if(d!==+c[9]) return false; s=0; for(let i=0;i<10;i++) s+=+c[i]*(11-i); d=(s*10)%11%10; return d===+c[10]; }
+$('#save-dados').addEventListener('click', ()=>{
+  const nome=$('#nome').value.trim().replace(/\s+/g,' '), cpf=dig($('#cpf').value);
+  if(nome.length<2) return erro('nome','Escreva o seu nome.'); erro('nome');
+  if(cpf.length<11) return erro('cpf', cpf.length? 'Faltam '+(11-cpf.length)+' números no CPF.' : 'Digite o seu CPF.');
+  if(!cpfOk(cpf)) return erro('cpf','Esse CPF parece ter um número errado. Confira e digite de novo.');
+  if(st.editing){ st.user.nome=nome; st.user.cpf=cpf; persist(); toast('Dados salvos.'); falar('Pronto. Seus dados foram salvos.'); st.hist.pop(); show('perfil',false); return; }
+  st.user={nome, cpf, tel:st.tel}; persist();
+  $('#ativa-title').textContent='Pronto, '+primeiroNome()+'!';
+  st.hist=['home']; show('ativa',false);
+});
+
+// ---------- T7 ----------
+$('#edit-dados').addEventListener('click', ()=>{ st.editing=true; prepDados(); show('dados'); });
+$('#logout').addEventListener('click', ()=>{ st.hist=['welcome']; show('welcome',false); toast('Você saiu. Para voltar, toque em Já tenho conta.'); });
+
+// ---------- T8 foto ----------
+function setFotoMode(review){ $('#foto-take').hidden=review; $('#foto-review').hidden=!review; }
+$('#foto-in').addEventListener('change', e=>{
+  const f=e.target.files && e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ const img=new Image(); img.onload=()=>{
+      // reduz a foto (critério: arquivo leve para celular simples)
+      const max=900, k=Math.min(1,max/Math.max(img.width,img.height)), c=document.createElement('canvas');
+      c.width=Math.round(img.width*k); c.height=Math.round(img.height*k); c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      st.foto=c.toDataURL('image/jpeg',0.7); $('#foto-img').src=st.foto; setFotoMode(true);
+      if(autoAudio) falar(ROTEIRO.foto(), $('#s-foto [data-listen]'));
+    }; img.src=r.result; };
+  r.readAsDataURL(f); e.target.value='';
+});
+$('#foto-again').addEventListener('click', ()=>{ setFotoMode(false); $('#foto-in').click(); });
+$('#foto-skip').addEventListener('click', ()=>{ st.foto=null; show('produto'); });
+$('#sell-more').addEventListener('click', ()=>{ st.hist=['home']; show('foto'); });
+
+// ---------- T9 produto ----------
+function renderOpts(){
+  $('#prods').innerHTML = PRODS.map(p=>'<button type="button" class="opt prod" data-prod="'+p.id+'" aria-pressed="'+(st.prod===p.id)+'">'+p.svg+p.nome+'</button>').join('');
+  $('#units').innerHTML = UNITS.map(u=>'<button type="button" class="opt unit" data-unit="'+u.id+'" aria-pressed="'+(st.unit===u.id)+'">'+u.nome+'</button>').join('');
+  $('#tags').innerHTML = TAGS.map(t=>'<button type="button" class="opt tag" data-tag="'+t+'" aria-pressed="'+(!!st.tags[t])+'">'+t+'</button>').join('');
+  $('#outro').hidden = st.prod!=='outro';
+  $('#preco').value = reaisTxt(st.cents).replace('R$ ','');
+  $('#preco-say').textContent = 'Vai aparecer: '+reaisTxt(st.cents)+' '+unitObj().txt;
+}
+$('#s-produto').addEventListener('click', e=>{
+  const p=e.target.closest('[data-prod]'), u=e.target.closest('[data-unit]'), t=e.target.closest('[data-tag]');
+  if(p){ st.prod=p.dataset.prod; renderOpts(); falar(st.prod==='outro'?'Outro. Escreva o nome do produto.':PRODS.find(x=>x.id===st.prod).nome); if(st.prod==='outro') $('#outro').focus(); }
+  if(u){ st.unit=u.dataset.unit; renderOpts(); falar('Vende por '+unitObj().fala.replace(/^(o|a) /,'')); }
+  if(t){ st.tags[t.dataset.tag]=!st.tags[t.dataset.tag]; renderOpts(); falar(t.dataset.tag+(st.tags[t.dataset.tag]?', marcado':', desmarcado')); }
+});
+// preço estilo caixa registradora: só números, vírgula automática
+$('#preco').addEventListener('input', e=>{ const d=dig(e.target.value).slice(-7); st.cents=parseInt(d||'0',10); renderOpts(); erro('preco'); const el=$('#preco'); el.setSelectionRange(el.value.length,el.value.length); });
+$('#preco').addEventListener('blur', ()=>{ if(st.cents) falar(reaisFala(st.cents)+' '+unitObj().fala); });
+$('#to-previa').addEventListener('click', ()=>{
+  if(st.prod==='outro' && !$('#outro').value.trim()){ toast('Escreva o nome do produto.'); falar('Escreva o nome do produto.'); $('#outro').focus(); return; }
+  if(!st.cents) return erro('preco','Digite o preço do produto.');
+  show('previa');
+});
+
+// ---------- cartão ----------
+function cardHTML(p){
+  const pic = p.foto ? '<img src="'+p.foto+'" alt="Foto de '+p.nome+'">' : (PRODS.find(x=>x.id===p.prod)||PRODS[5]).svg.replace(/width="44" height="44"/,'width="90" height="90"');
+  const tags = (p.tags||[]).map(t=>'<span class="chip" style="font-size:14px;padding:3px 10px">'+t+'</span>').join(' ');
+  return '<article class="card"><div class="pic">'+pic+'</div><div class="info"><span class="name">'+esc(p.nome)+'</span><span class="val">'+p.val+'</span>'+(tags?'<div class="tags" style="gap:6px">'+tags+'</div>':'')+(p.desc?'<span class="who">'+esc(p.desc)+'</span>':'')+'<span class="who">'+esc(p.who)+'</span></div></article>';
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function rascunho(){ return {nome:prodNome(), prod:st.prod, val:reaisTxt(st.cents)+' '+unitObj().txt, tags:TAGS.filter(t=>st.tags[t]), desc:$('#desc').value.trim(), who:(st.user?st.user.nome:'Produtora')+' · Feira na Mão', foto:st.foto}; }
+$('#publish').addEventListener('click', ()=>{
+  st.products.unshift(rascunho()); persist();
+  st.foto=null; st.cents=0; $('#desc').value=''; $('#outro').value=''; setFotoMode(false);
+  st.hist=['home']; show('ok',false);
+});
+
+// ---------- microfone (se o navegador permitir) ----------
+document.addEventListener('click', e=>{
+  const b=e.target.closest('[data-mic]'); if(!b) return;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const falha = ()=>{ toast('O microfone não está disponível nesta prévia. Pode digitar.'); falar('O microfone não funciona aqui. Pode digitar.'); };
+  if(!SR) return falha();
+  try{
+    parar(); const r=new SR(); r.lang='pt-BR'; r.interimResults=false; r.maxAlternatives=1;
+    b.style.outline='4px solid var(--corn)';
+    r.onresult = ev=>{ const t=ev.results[0][0].transcript; const inp=$('#'+b.dataset.mic); inp.value = inp.value? inp.value+' '+t : t; falar('Entendi: '+t); };
+    r.onerror = ()=>falha(); r.onend = ()=>{ b.style.outline=''; };
+    r.start(); toast('Pode falar agora.');
+  }catch(err){ falha(); }
+});
+
+// ---------- renderização por tela ----------
+const RENDER = {
+  home(){ $('#home-name').textContent = st.user? st.user.nome : ''; $('#home-count').textContent = st.products.length; },
+  perfil(){ $('#p-nome').textContent=st.user.nome; $('#p-tel').textContent=maskTel(st.user.tel); $('#p-cpf').textContent='***.'+st.user.cpf.slice(3,6)+'.'+st.user.cpf.slice(6,9)+'-**'; },
+  foto(){ setFotoMode(!!st.foto); },
+  produto(){ renderOpts(); },
+  previa(){ $('#previa-card').innerHTML = cardHTML(rascunho()); },
+  feira(){ const all = st.products.concat(EXEMPLOS); $('#feed').innerHTML = all.length? all.map(cardHTML).join('') : '<div class="empty">Ainda não há produtos.</div>'; }
+};
+
+// início: se já existe conta salva neste navegador, abre no Início
+if(st.user){ st.hist=['home']; show('home',false); } else { show('welcome',false); }
+})();
+</script>
+
+</body></html>
